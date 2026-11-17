@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>آزمون صوتی خودکار هفتم</title>
+<title>آزمون جامع پایان ترم زبان هفتم</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -37,12 +37,6 @@
     box-shadow: 0 8px 24px #22c55e66; transition: .2s; width: 100%; max-width: 320px;
   }
   #splash button:active { transform: scale(.97); }
-  #splash .perm-list {
-    background: #0f172a; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px;
-    font-size: 12px; color: #94a3b8; text-align: right; line-height: 2; width: 100%; max-width: 340px;
-  }
-  #splash .perm-list .row2 { display: flex; align-items: center; gap: 8px; }
-  #splash .perm-list .dot { width: 8px; height: 8px; border-radius: 50%; background: #fbbf24; flex-shrink: 0; }
 
   .card {
     background: #1e293b; border-radius: 20px; padding: 24px;
@@ -54,8 +48,8 @@
     border-radius: 16px; margin-bottom: 20px; border: 1px dashed #475569;
   }
   .question-label { font-size: 12px; color: #94a3b8; margin-bottom: 10px; }
-  .question-text { font-size: 32px; font-weight: bold; color: #60a5fa; min-height: 50px; }
-  .question-text.fa { color: #f472b6; direction: rtl; }
+  .question-text { font-size: 28px; font-weight: bold; color: #60a5fa; min-height: 50px; }
+  .question-text.fa { color: #f472b6; direction: rtl; font-size: 24px; }
 
   .mic-status {
     font-size: 48px; margin: 10px 0; height: 60px;
@@ -81,15 +75,6 @@
   button.main { background: #1d4ed8; font-weight: bold; }
   button.danger { background: #b91c1c; }
 
-  .toggle {
-    display: flex; background: #0f172a; border-radius: 12px; overflow: hidden; margin-bottom: 16px;
-  }
-  .toggle button {
-    flex: 1; background: none; border: none; color: #94a3b8; padding: 10px;
-    font-family: inherit; font-size: 12px; cursor: pointer;
-  }
-  .toggle button.active { background: #1d4ed8; color: #fff; }
-
   .stats { display: flex; justify-content: space-around; text-align: center; font-size: 11px; color:#94a3b8; margin-top: 16px;}
   .stats b { display: block; font-size: 22px; color: #fbbf24; }
 
@@ -103,147 +88,213 @@
   .toast.err { background: #dc2626; }
   .progress { height: 6px; background: #0f172a; border-radius: 3px; overflow: hidden; margin: 10px 0; }
   .progress > div { height: 100%; background: linear-gradient(90deg, #fbbf24, #f472b6); width: 0%; transition: .3s; }
+
+  /* استایل صفحه نتیجه */
+  .result-screen { display: none; text-align: center; padding: 20px 0; }
+  .result-screen h2 { color: #fbbf24; font-size: 24px; }
+  .result-score { font-size: 48px; font-weight: bold; color: #4ade80; margin: 20px 0; }
+  .result-details { display: flex; justify-content: space-around; margin: 20px 0; font-size: 16px; }
+  .result-details div { background: #0f172a; padding: 10px 20px; border-radius: 10px; }
 </style>
 </head>
 <body>
 
 <!-- صفحه خوش‌آمد و درخواست مجوز -->
 <div id="splash">
-  <div class="big-icon">🎤</div>
-  <h2>آزمون صوتی خودکار هفتم</h2>
-  <p>برای شروع، به میکروفن و بلندگو نیاز داریم. دکمه زیر را بزن و اجازه بده.</p>
+  <div class="big-icon">📝</div>
+  <h2>آزمون پایان ترم زبان هفتم</h2>
+  <p>کل کتاب (Lesson 1 تا 8) — بدون تکرار، کاملاً تصادفی</p>
 
-  <div class="perm-list">
-    <div class="row2"><span class="dot"></span> 🎤 میکروفن (برای شنیدن جواب تو)</div>
-    <div class="row2"><span class="dot"></span> 🔊 بلندگو (برای پخش سوال و نتیجه)</div>
-    <div class="row2"><span class="dot"></span> 💾 حافظه محلی (برای ذخیره پیشرفت)</div>
-  </div>
-
-  <button onclick="requestPermissionsAndStart()">✅ شروع، لطفاً همه مجوزها را بده</button>
+  <button onclick="requestPermissionsAndStart()">✅ شروع آزمون پایان ترم</button>
   <p class="hint" style="color:#94a3b8; margin-top: 16px;">
-    اگر مرورگرت پشتیبانی نکند، از Chrome استفاده کن.<br>
-    بعد از زدن دکمه، یک پیام اجازه میکروفن می‌بینی — Allow را بزن.
+    پس از زدن دکمه، به میکروفن اجازه (Allow) بدهید.
   </p>
 </div>
 
 <header>
-  <h1>🎤 آزمون صوتی خودکار هفتم</h1>
-  <p>صفحات ۴۸ تا ۵۲ — بدون لمس، فقط جواب بده!</p>
+  <h1>📝 آزمون پایان ترم زبان هفتم</h1>
+  <p>هیچ سوالی تکرار نمی‌شود!</p>
 </header>
 
 <div class="container">
+  <div id="quizContainer">
+    <div class="card">
+      <div class="progress"><div id="progBar"></div></div>
 
-  <div class="card">
-    <div class="toggle">
-      <button id="modeEn" class="active" onclick="setMode('en')">سوال انگلیسی (پاسخ فارسی)</button>
-      <button id="modeFa" onclick="setMode('fa')">سوال فارسی (پاسخ انگلیسی)</button>
+      <div class="question-box">
+        <div class="question-label" id="qLabel">آماده‌ام...</div>
+        <div class="question-text" id="questionText">...</div>
+      </div>
+
+      <div class="mic-status" id="micIcon">🔊</div>
+      <div class="status" id="status">در حال آماده‌سازی...</div>
+
+      <div class="row">
+        <button class="main" id="startBtn" onclick="toggleAuto()">▶️ شروع آزمون</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button onclick="forceNext()">⏭️ رد کردن</button>
+        <button class="danger" onclick="finishExam()">🏁 پایان و دیدن نتیجه</button>
+      </div>
+
+      <div class="stats">
+        <div>درست <b id="statCorrect">0</b></div>
+        <div>غلط <b id="statWrong">0</b></div>
+        <div>امتیاز <b id="statScore">0</b></div>
+      </div>
     </div>
-
-    <div class="progress"><div id="progBar"></div></div>
-
-    <div class="question-box">
-      <div class="question-label" id="qLabel">آماده‌ام...</div>
-      <div class="question-text" id="questionText">...</div>
-    </div>
-
-    <div class="mic-status" id="micIcon">🔊</div>
-    <div class="status" id="status">در حال آماده‌سازی...</div>
-
-    <div class="row">
-      <button class="main" id="startBtn" onclick="toggleAuto()">▶️ شروع آزمون خودکار</button>
-    </div>
-    <div class="row" style="margin-top:8px">
-      <button onclick="forceNext()">⏭️ رد کردن سوال</button>
-      <button onclick="resetAll()">🔄 ریست کامل</button>
-    </div>
-
-    <div class="stats">
-      <div>درست <b id="statCorrect">0</b></div>
-      <div>غلط <b id="statWrong">0</b></div>
-      <div>امتیاز <b id="statScore">0</b></div>
-    </div>
-
-    <p class="hint">
-      🎙️ بعد از شروع، خودکار سوال خوانده می‌شود، میکروفن روشن می‌شود و منتظر جواب تو می‌ماند. نتیجه را صوتی می‌گوید و بعدی می‌رود.<br>
-      📱 برای بهترین نتیجه در محیط ساکت و با Chrome استفاده کن.
-    </p>
   </div>
 
+  <!-- صفحه نتیجه -->
+  <div id="resultContainer" class="card result-screen">
+    <h2>🏆 نتیجه نهایی آزمون</h2>
+    <div class="result-score" id="finalScore">20</div>
+    <div class="result-details">
+      <div>درست: <b id="resCorrect">0</b></div>
+      <div>غلط: <b id="resWrong">0</b></div>
+    </div>
+    <button class="main" onclick="location.reload()" style="margin-top:20px">🔄 آزمون مجدد</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ---------- داده‌ها (صفحات ۴۸ تا ۵۲) ----------
+// ---------- داده‌های کامل کتاب هفتم (Lesson 1 تا 8) ----------
 const WORDS = [
-  {en:"school", fa:"مدرسه"},
-  {en:"classroom", fa:"کلاس درس"},
-  {en:"door", fa:"در"},
-  {en:"blackboard", fa:"تخته سیاه"},
-  {en:"desk", fa:"میز تحریر"},
-  {en:"chair", fa:"صندلی"},
-  {en:"pen", fa:"خودکار"},
-  {en:"pencil", fa:"مداد"},
-  {en:"book", fa:"کتاب"},
-  {en:"notebook", fa:"دفتر"},
-  {en:"ruler", fa:"خط‌کش"},
-  {en:"dictionary", fa:"فرهنگ لغت"},
-  {en:"eraser", fa:"پاک‌کن"},
-  {en:"bag", fa:"کیف"},
-  {en:"pencil sharpener", fa:"مداد تراش"},
-  {en:"backpack", fa:"کوله پشتی"},
-  {en:"marker", fa:"ماژیک"},
-  {en:"bench", fa:"نیمکت"},
-  {en:"pencil case", fa:"جامدادی"},
-  {en:"chalk", fa:"گچ"},
-  {en:"sit down", fa:"نشستن"},
-  {en:"stand up", fa:"ایستادن"},
-  {en:"boy", fa:"پسر"},
-  {en:"girl", fa:"دختر"},
-  {en:"man", fa:"مرد"},
-  {en:"woman", fa:"زن"},
-  {en:"teacher", fa:"معلم"},
-  {en:"student", fa:"دانش‌آموز"},
-  {en:"library", fa:"کتابخانه"},
-  {en:"library card", fa:"کارت کتابخانه"},
+  // Lesson 1
+  {en:"Hello", fa:"سلام"}, {en:"Hi", fa:"سلام (غیررسمی)"}, {en:"Good morning", fa:"صبح بخیر"},
+  {en:"Good afternoon", fa:"عصر بخیر"}, {en:"Good evening", fa:"شب بخیر"},
+  {en:"Goodbye", fa:"خداحافظ"}, {en:"How are you?", fa:"حالت چطور است؟"},
+  {en:"I am fine, thank you", fa:"من خوبم، ممنون"}, {en:"What is your name?", fa:"اسم تو چیست؟"},
+  {en:"My name is Ali", fa:"اسم من علی است"}, {en:"Nice to meet you", fa:"از آشنایی با شما خوشحالم"},
+  {en:"This is", fa:"این ... است"}, {en:"Yes", fa:"بله"}, {en:"No", fa:"نه"},
+  // Lesson 2
+  {en:"book", fa:"کتاب"}, {en:"notebook", fa:"دفتر"}, {en:"pen", fa:"خودکار"},
+  {en:"pencil", fa:"مداد"}, {en:"bag", fa:"کیف"}, {en:"ruler", fa:"خط‌کش"},
+  {en:"eraser", fa:"پاک‌کن"}, {en:"dictionary", fa:"فرهنگ لغت"}, {en:"What is this?", fa:"این چیست؟"},
+  {en:"This is a book", fa:"این یک کتاب است"}, {en:"What is that?", fa:"آن چیست؟"},
+  {en:"Is this a pen?", fa:"آیا این یک خودکار است؟"}, {en:"Yes, it is", fa:"بله، هست"},
+  {en:"No, it is not", fa:"نه، نیست"}, {en:"Look at the board", fa:"به تخته نگاه کن"},
+  {en:"Open your book", fa:"کتابت را باز کن"}, {en:"Close your book", fa:"کتابت را ببند"},
+  {en:"Listen", fa:"گوش کن"}, {en:"Repeat", fa:"تکرار کن"},
+  // Lesson 3
+  {en:"red", fa:"قرمز"}, {en:"blue", fa:"آبی"}, {en:"green", fa:"سبز"},
+  {en:"yellow", fa:"زرد"}, {en:"black", fa:"سیاه"}, {en:"white", fa:"سفید"},
+  {en:"orange", fa:"نارنجی"}, {en:"brown", fa:"قهوه‌ای"}, {en:"What color is this?", fa:"این چه رنگی است؟"},
+  {en:"It is red", fa:"آن قرمز است"}, {en:"My favorite color is blue", fa:"رنگ مورد علاقه من آبی است"},
+  {en:"What is your favorite color?", fa:"رنگ مورد علاقه تو چیست؟"}, {en:"shirt", fa:"پیراهن"},
+  {en:"pants", fa:"شلوار"}, {en:"shoes", fa:"کفش"}, {en:"socks", fa:"جوراب"},
+  {en:"hat", fa:"کلاه"}, {en:"coat", fa:"پالتو"},
+  // Lesson 4
+  {en:"father", fa:"پدر"}, {en:"mother", fa:"مادر"}, {en:"brother", fa:"برادر"},
+  {en:"sister", fa:"خواهر"}, {en:"grandfather", fa:"پدربزرگ"}, {en:"grandmother", fa:"مادربزرگ"},
+  {en:"uncle", fa:"عمو / دایی"}, {en:"aunt", fa:"عمه / خاله"}, {en:"family", fa:"خانواده"},
+  {en:"Who is he?", fa:"او (مرد) کیست؟"}, {en:"Who is she?", fa:"او (زن) کیست؟"},
+  {en:"He is my brother", fa:"او برادر من است"}, {en:"She is my sister", fa:"او خواهر من است"},
+  {en:"This is my family", fa:"این خانواده من است"}, {en:"How old are you?", fa:"چند سالت است؟"},
+  {en:"I am twelve years old", fa:"من دوازده سال دارم"}, {en:"How old is he?", fa:"او چند سال دارد؟"},
+  {en:"doctor", fa:"دکتر"}, {en:"teacher", fa:"معلم"}, {en:"student", fa:"دانش‌آموز"},
+  {en:"engineer", fa:"مهندس"}, {en:"nurse", fa:"پرستار"}, {en:"driver", fa:"راننده"},
+  // Lesson 5
+  {en:"apple", fa:"سیب"}, {en:"banana", fa:"موز"}, {en:"orange", fa:"پرتقال"},
+  {en:"bread", fa:"نان"}, {en:"milk", fa:"شیر"}, {en:"water", fa:"آب"},
+  {en:"egg", fa:"تخم مرغ"}, {en:"rice", fa:"برنج"}, {en:"chicken", fa:"مرغ"},
+  {en:"fish", fa:"ماهی"}, {en:"What do you want?", fa:"چه می‌خواهی؟"},
+  {en:"I want an apple", fa:"من یک سیب می‌خواهم"}, {en:"What does he want?", fa:"او چه می‌خواهد؟"},
+  {en:"Do you like apples?", fa:"آیا سیب دوست داری؟"}, {en:"Yes, I do", fa:"بله، دوست دارم"},
+  {en:"No, I do not", fa:"نه، دوست ندارم"}, {en:"I am hungry", fa:"من گرسنه هستم"},
+  {en:"I am thirsty", fa:"من تشنه هستم"}, {en:"Delicious", fa:"خوشمزه"}, {en:"food", fa:"غذا"},
+  // Lesson 6
+  {en:"school", fa:"مدرسه"}, {en:"classroom", fa:"کلاس درس"}, {en:"library", fa:"کتابخانه"},
+  {en:"door", fa:"در"}, {en:"window", fa:"پنجره"}, {en:"blackboard", fa:"تخته سیاه"},
+  {en:"desk", fa:"میز تحریر"}, {en:"chair", fa:"صندلی"}, {en:"Where is the book?", fa:"کتاب کجاست؟"},
+  {en:"It is on the desk", fa:"آن روی میز است"}, {en:"It is in the bag", fa:"آن داخل کیف است"},
+  {en:"It is under the chair", fa:"آن زیر صندلی است"}, {en:"on", fa:"روی"}, {en:"in", fa:"در / داخل"},
+  {en:"under", fa:"زیر"}, {en:"next to", fa:"کنار"}, {en:"behind", fa:"پشت"},
+  {en:"in front of", fa:"جلوی"}, {en:"between", fa:"بین"}, {en:"playground", fa:"حیاط مدرسه"},
+  {en:"office", fa:"دفتر"},
+  // Lesson 7
+  {en:"run", fa:"دویدن"}, {en:"walk", fa:"راه رفتن"}, {en:"jump", fa:"پریدن"},
+  {en:"swim", fa:"شنا کردن"}, {en:"ride a bike", fa:"دوچرخه سواری کردن"},
+  {en:"play football", fa:"فوتبال بازی کردن"}, {en:"watch TV", fa:"تلویزیون تماشا کردن"},
+  {en:"read a book", fa:"کتاب خواندن"}, {en:"write", fa:"نوشتن"}, {en:"sleep", fa:"خوابیدن"},
+  {en:"What are you doing?", fa:"داری چه کار می‌کنی؟"}, {en:"I am reading a book", fa:"دارم کتاب می‌خوانم"},
+  {en:"He is playing football", fa:"او دارد فوتبال بازی می‌کند"}, {en:"They are swimming", fa:"آنها دارند شنا می‌کنند"},
+  {en:"Can you swim?", fa:"آیا می‌توانی شنا کنی؟"}, {en:"Yes, I can", fa:"بله، می‌توانم"},
+  {en:"No, I cannot", fa:"نه، نمی‌توانم"}, {en:"Can he ride a bike?", fa:"آیا او می‌تواند دوچرخه سواری کند؟"},
+  {en:"sport", fa:"ورزش"}, {en:"game", fa:"بازی"},
+  // Lesson 8
+  {en:"Spring", fa:"بهار"}, {en:"Summer", fa:"تابستان"}, {en:"Fall", fa:"پاییز"},
+  {en:"Winter", fa:"زمستان"}, {en:"season", fa:"فصل"}, {en:"weather", fa:"هوا"},
+  {en:"sunny", fa:"آفتابی"}, {en:"rainy", fa:"بارانی"}, {en:"cloudy", fa:"ابری"},
+  {en:"snowy", fa:"برفی"}, {en:"windy", fa:"بادی"}, {en:"hot", fa:"گرم"},
+  {en:"cold", fa:"سرد"}, {en:"warm", fa:"ملایم"}, {en:"cool", fa:"خنک"},
+  {en:"What is the weather like?", fa:"هوا چطور است؟"}, {en:"It is sunny", fa:"هوا آفتابی است"},
+  {en:"It is raining", fa:"باران می‌بارد"}, {en:"It is snowing", fa:"برف می‌بارد"},
+  {en:"What season do you like?", fa:"چه فصلی را دوست داری؟"}, {en:"I like spring", fa:"من بهار را دوست دارم"},
+  {en:"Today", fa:"امروز"}, {en:"Tomorrow", fa:"فردا"}, {en:"Yesterday", fa:"دیروز"},
+  // جملات تکمیلی
+  {en:"Excuse me", fa:"ببخشید"}, {en:"I am sorry", fa:"متاسفم"}, {en:"Thank you very much", fa:"خیلی ممنون"},
+  {en:"You are welcome", fa:"خواهش می‌کنم"}, {en:"Please", fa:"لطفا"}, {en:"See you later", fa:"بعدا می‌بینمت"},
+  {en:"See you tomorrow", fa:"فردا می‌بینمت"}, {en:"How do you spell it?", fa:"چطور آن را هجی می‌کنی؟"},
+  {en:"What does this mean?", fa:"این چه معنایی دارد؟"}, {en:"I do not know", fa:"نمی‌دانم"},
+  {en:"I know", fa:"می‌دانم"}, {en:"Can you help me?", fa:"می‌توانی به من کمک کنی؟"},
+  {en:"Of course", fa:"البته"}, {en:"Let us go", fa:"بیا برویم"}, {en:"Come here", fa:"بیا اینجا"},
+  {en:"Go there", fa:"برو آنجا"}, {en:"Stand up", fa:"بایست"}, {en:"Sit down", fa:"بنشین"},
+  {en:"Open the door", fa:"در را باز کن"}, {en:"Close the window", fa:"پنجره را ببند"},
+  {en:"Listen to me", fa:"به من گوش کن"}, {en:"Look at the picture", fa:"به تصویر نگاه کن"},
+  {en:"Write your name", fa:"اسمت را بنویس"}, {en:"Read the text", fa:"متن را بخوان"},
+  {en:"number", fa:"عدد / شماره"}, {en:"one", fa:"یک"}, {en:"two", fa:"دو"},
+  {en:"three", fa:"سه"}, {en:"four", fa:"چهار"}, {en:"five", fa:"پنج"},
+  {en:"six", fa:"شش"}, {en:"seven", fa:"هفت"}, {en:"eight", fa:"هشت"},
+  {en:"nine", fa:"نه"}, {en:"ten", fa:"ده"},
+  {en:"Monday", fa:"دوشنبه"}, {en:"Tuesday", fa:"سه‌شنبه"}, {en:"Wednesday", fa:"چهارشنبه"},
+  {en:"Thursday", fa:"پنجشنبه"}, {en:"Friday", fa:"جمعه"}, {en:"Saturday", fa:"شنبه"}, {en:"Sunday", fa:"یکشنبه"}
 ];
 
-// ---------- عدم تکرار ----------
+// ---------- الگوریتم عدم تکرار کامل ----------
 let bag = [];
-let history = JSON.parse(localStorage.getItem('eng7_history') || '[]');
-let stats = JSON.parse(localStorage.getItem('eng7_auto_stats') || '{"correct":0,"wrong":0,"score":0}');
+let history = JSON.parse(localStorage.getItem('exam_history') || '[]');
+let stats = { correct: 0, wrong: 0, score: 0 };
+let examActive = false;
 
-function refillBag() {
+function initExamBag() {
+  // کلماتی که هنوز پرسیده نشده‌اند
   let remaining = WORDS.filter(w => !history.includes(w.en));
+  
+  // اگر همه سوالات پرسیده شدند، تاریخچه پاک می‌شود تا ترم جدید شروع شود
   if (remaining.length === 0) {
     history = [];
-    localStorage.setItem('eng7_history', JSON.stringify(history));
+    localStorage.setItem('exam_history', JSON.stringify(history));
     remaining = [...WORDS];
-    toast('دور جدید شروع شد!');
+    toast('همه سوالات پرسیده شدند. ترم جدید آغاز شد!');
   }
-  bag = shuffle(remaining);
+  
+  // شافل کردن (به هم ریختن کامل ترتیب)
+  bag = shuffle([...remaining]);
 }
+
 function shuffle(a) {
-  for (let i=a.length-1; i>0; i--) {
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]] = [a[j],a[i]];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
 }
-function saveHistory() { localStorage.setItem('eng7_history', JSON.stringify(history)); }
 
 // ---------- وضعیت ----------
 let current = null;
-let mode = 'en';
-let autoMode = false;
+let mode = 'en'; // نوع سوال: en (انگلیسی به فارسی) یا fa (فارسی به انگلیسی)
 let answered = false;
 let isSpeaking = false;
 let isListening = false;
 let micPermissionGranted = false;
+let recognition = null;
+let autoMode = false;
 
 // ---------- تشخیص گفتار ----------
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null;
 if (SpeechRecognition) {
   recognition = new SpeechRecognition();
   recognition.continuous = true;
@@ -258,24 +309,22 @@ if (SpeechRecognition) {
   recognition.onend = () => {
     isListening = false;
     setMicIcon('🔊', '');
-    if (autoMode && !answered && current) {
-      setTimeout(() => { if (autoMode && !answered && current) safeStartListening(); }, 300);
+    if (examActive && autoMode && !answered && current) {
+      setTimeout(() => { if (examActive && autoMode && !answered && current) safeStartListening(); }, 300);
     }
   };
   recognition.onerror = (e) => {
     isListening = false;
     setMicIcon('🔊', '');
     if (e.error === 'no-speech') {
-      if (autoMode && !answered && current) setTimeout(() => safeStartListening(), 500);
+      if (examActive && autoMode && !answered && current) setTimeout(() => safeStartListening(), 500);
       return;
     }
     if (e.error === 'not-allowed') {
-      setStatus('❌ دسترسی میکروفن داده نشد. تنظیمات مرورگر را بررسی کن', 'bad');
-      autoMode = false;
-      document.getElementById('startBtn').textContent = '▶️ شروع آزمون خودکار';
+      setStatus('❌ دسترسی میکروفن داده نشد', 'bad');
       return;
     }
-    if (autoMode && !answered && current) setTimeout(() => safeStartListening(), 800);
+    if (examActive && autoMode && !answered && current) setTimeout(() => safeStartListening(), 800);
   };
   recognition.onresult = (event) => {
     for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -295,87 +344,83 @@ function safeStartListening() {
   } catch(e) {}
 }
 
-// ---------- درخواست مجوز و شروع ----------
+// ---------- شروع آزمون ----------
 async function requestPermissionsAndStart() {
   const splash = document.getElementById('splash');
   try {
-    // ۱. درخواست میکروفن
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     micPermissionGranted = true;
-    // بلافاصله استریم را قطع می‌کنیم چون فقط برای گرفتن مجوز بود
     stream.getTracks().forEach(t => t.stop());
   } catch (err) {
-    alert('❌ دسترسی میکروفن داده نشد!\n\nبرای استفاده باید به میکروفن اجازه بدهی.\nدر تنظیمات مرورگر (آیکون قفل کنار آدرس) مجوز Microphone را Allow کن و صفحه را رفرش کن.');
+    alert('❌ دسترسی میکروفن داده نشد!');
     return;
   }
-
-  // ۲. مخفی کردن صفحه خوش‌آمد
   splash.classList.add('hidden');
-
-  // ۳. تست بلندگو (یک صدای کوتاه)
-  setStatus('🔊 تست بلندگو...', '');
-  speakText('Ready', 'en-US', () => {
-    // ۴. شروع خودکار آزمون
-    if (!history || history.length === 0) refillBag();
-    startAuto();
-  });
+  examActive = true;
+  initExamBag();
+  startAuto();
 }
 
-// ---------- شروع خودکار ----------
-function toggleAuto() {
-  if (autoMode) pauseAuto();
-  else {
-    if (!micPermissionGranted) { requestPermissionsAndStart(); return; }
-    startAuto();
-  }
-}
 function startAuto() {
   autoMode = true;
   document.getElementById('startBtn').textContent = '⏸️ توقف آزمون';
   document.getElementById('startBtn').classList.remove('main');
   document.getElementById('startBtn').classList.add('danger');
-  if (!history || history.length === 0) refillBag();
   nextQuestion(true);
 }
-function pauseAuto() {
-  autoMode = false;
-  document.getElementById('startBtn').textContent = '▶️ شروع آزمون خودکار';
-  document.getElementById('startBtn').classList.add('main');
-  document.getElementById('startBtn').classList.remove('danger');
-  if (recognition && isListening) try { recognition.stop(); } catch(e){}
-  speechSynthesis.cancel();
-  setStatus('آزمون متوقف شد', '');
-  setMicIcon('🔊', '');
+
+function toggleAuto() {
+  if (!micPermissionGranted) { requestPermissionsAndStart(); return; }
+  if (autoMode) {
+    autoMode = false;
+    document.getElementById('startBtn').textContent = '▶️ شروع آزمون';
+    document.getElementById('startBtn').classList.add('main');
+    document.getElementById('startBtn').classList.remove('danger');
+    if (recognition && isListening) try { recognition.stop(); } catch(e){}
+    speechSynthesis.cancel();
+    setStatus('آزمون متوقف شد', '');
+  } else {
+    startAuto();
+  }
 }
 
-// ---------- سوال ----------
-function setMode(m) {
-  mode = m;
-  document.getElementById('modeEn').classList.toggle('active', m==='en');
-  document.getElementById('modeFa').classList.toggle('active', m==='fa');
-  document.getElementById('qLabel').textContent = (m==='en') ? 'این کلمه را به فارسی بگو:' : 'این کلمه فارسی را به انگلیسی بگو:';
-  if (autoMode) { pauseAuto(); startAuto(); }
-}
-
+// ---------- سوال بعدی (کاملاً تصادفی و یکتا) ----------
 function nextQuestion(speak) {
-  if (!autoMode) return;
+  if (!examActive || !autoMode) return;
   answered = false;
-  if (bag.length === 0) refillBag();
+  
+  // اگر کیسه خالی شد، یعنی یک دور کامل تمام شده
+  if (bag.length === 0) {
+    initExamBag();
+    if (bag.length === 0) { finishExam(); return; } // در صورت خالی بودن کامل
+  }
+  
+  // برداشتن یک کلمه از کیسه
   current = bag.pop();
   if (!current) return;
-  if (!history.includes(current.en)) { history.push(current.en); saveHistory(); }
+  
+  // ثبت در تاریخچه برای جلوگیری از تکرار در ترم‌های آینده
+  if (!history.includes(current.en)) {
+    history.push(current.en);
+    localStorage.setItem('exam_history', JSON.stringify(history));
+  }
 
+  // تغییر تصادفی نوع سوال (انگلیسی به فارسی یا فارسی به انگلیسی)
+  mode = Math.random() < 0.5 ? 'en' : 'fa';
+  
   const qt = document.getElementById('questionText');
   const ql = document.getElementById('qLabel');
+  
   if (mode === 'en') {
     qt.textContent = current.en;
     qt.classList.remove('fa');
-    ql.textContent = 'این کلمه را به فارسی بگو:';
+    ql.textContent = 'این را به فارسی بگو:';
   } else {
     qt.textContent = current.fa;
     qt.classList.add('fa');
-    ql.textContent = 'این کلمه فارسی را به انگلیسی بگو:';
+    ql.textContent = 'این را به انگلیسی بگو:';
   }
+  
   updateProgress();
   setStatus('...', '');
 
@@ -389,10 +434,13 @@ function speakQuestionThenListen() {
   setStatus('🎧 گوش کن...', '');
   const text = (mode === 'en') ? current.en : current.fa;
   const lang = (mode === 'en') ? 'en-US' : 'fa-IR';
+  
   speakText(text, lang, () => {
     isSpeaking = false;
     setMicIcon('🔊', '');
-    if (autoMode && !answered && current) setTimeout(() => safeStartListening(), 400);
+    if (examActive && autoMode && !answered && current) {
+      setTimeout(() => safeStartListening(), 400);
+    }
   });
 }
 
@@ -412,6 +460,7 @@ function handleAnswer(transcript) {
   if (!current || answered) return;
   answered = true;
   if (recognition) try { recognition.stop(); } catch(e){}
+  
   const expected = (mode === 'en') ? current.fa : current.en;
   const ok = isClose(transcript, expected);
 
@@ -419,14 +468,14 @@ function handleAnswer(transcript) {
     stats.correct++; stats.score += 10;
     setStatus('✅ درست! (' + transcript + ')', 'ok');
     setMicIcon('🎉', '');
-    speakFeedback(true, () => { if (autoMode) setTimeout(() => nextQuestion(true), 500); });
+    speakFeedback(true, () => { if (examActive && autoMode) setTimeout(() => nextQuestion(true), 500); });
   } else {
     stats.wrong++; stats.score = Math.max(0, stats.score - 5);
     setStatus('❌ نادرست. تو گفتی: "' + transcript + '" — درست: "' + expected + '"', 'bad');
     setMicIcon('😢', '');
-    speakFeedback(false, () => { if (autoMode) setTimeout(() => nextQuestion(true), 800); });
+    speakFeedback(false, () => { if (examActive && autoMode) setTimeout(() => nextQuestion(true), 800); });
   }
-  saveStats(); updateStats();
+  updateStats();
 }
 
 function normalize(s) {
@@ -438,6 +487,7 @@ function normalize(s) {
     .replace(/[آأإ]/g, 'ا')
     .trim();
 }
+
 function isClose(a, b) {
   const A = normalize(a), B = normalize(b);
   if (!A || !B) return false;
@@ -449,6 +499,7 @@ function isClose(a, b) {
   const maxLen = Math.max(A.length, B.length);
   return maxLen > 0 && (dist / maxLen) < 0.4;
 }
+
 function levenshtein(a, b) {
   const m = a.length, n = b.length;
   if (m === 0) return n; if (n === 0) return m;
@@ -465,42 +516,44 @@ function speakFeedback(ok, onEnd) {
   speakText(text, 'en-US', onEnd);
 }
 
-// ---------- کنترل ----------
+// ---------- پایان آزمون و نمایش نتیجه ----------
+function finishExam() {
+  examActive = false;
+  autoMode = false;
+  if (recognition && isListening) try { recognition.stop(); } catch(e){}
+  speechSynthesis.cancel();
+  
+  document.getElementById('quizContainer').style.display = 'none';
+  document.getElementById('resultContainer').style.display = 'block';
+  
+  const total = stats.correct + stats.wrong;
+  const finalScore = total > 0 ? Math.round((stats.correct / total) * 20) : 0;
+  
+  document.getElementById('finalScore').textContent = finalScore + ' / 20';
+  document.getElementById('resCorrect').textContent = stats.correct;
+  document.getElementById('resWrong').textContent = stats.wrong;
+}
+
 function forceNext() {
   if (recognition && isListening) try { recognition.stop(); } catch(e){}
   speechSynthesis.cancel();
-  if (!autoMode) {
-    if (bag.length === 0) refillBag();
-    current = bag.pop();
-    if (current && !history.includes(current.en)) { history.push(current.en); saveHistory(); }
-    if (current) {
-      const qt = document.getElementById('questionText');
-      if (mode === 'en') { qt.textContent = current.en; qt.classList.remove('fa'); }
-      else { qt.textContent = current.fa; qt.classList.add('fa'); }
-      updateProgress();
-    }
-  } else nextQuestion(true);
-}
-function resetAll() {
-  if (!confirm('همه آمار و تاریخچه پاک شود؟')) return;
-  pauseAuto();
-  stats = {correct:0, wrong:0, score:0}; history = []; bag = [];
-  saveStats(); saveHistory(); updateStats();
-  document.getElementById('questionText').textContent = '...';
-  document.getElementById('progBar').style.width = '0%';
-  setStatus('ریست شد', '');
+  answered = false;
+  nextQuestion(true);
 }
 
-function saveStats() { localStorage.setItem('eng7_auto_stats', JSON.stringify(stats)); }
 function updateStats() {
   document.getElementById('statCorrect').textContent = stats.correct;
   document.getElementById('statWrong').textContent = stats.wrong;
   document.getElementById('statScore').textContent = stats.score;
 }
+
 function updateProgress() {
-  const total = WORDS.length, done = history.length;
-  document.getElementById('progBar').style.width = Math.min(100, Math.round((done/total)*100)) + '%';
+  const total = WORDS.length;
+  const done = history.length;
+  const pct = Math.min(100, Math.round((done / total) * 100));
+  document.getElementById('progBar').style.width = pct + '%';
 }
+
 let toastTimer;
 function toast(msg, err) {
   const t = document.getElementById('toast');
@@ -509,18 +562,20 @@ function toast(msg, err) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>t.className='toast', 2000);
 }
+
 function setStatus(msg, cls) {
   const s = document.getElementById('status'); s.textContent = msg;
   s.className = 'status ' + (cls || '');
 }
+
 function setMicIcon(icon, cls) {
   const el = document.getElementById('micIcon'); el.textContent = icon;
   el.className = 'mic-status ' + (cls || '');
 }
 
-// ---------- شروع ----------
-updateStats(); updateProgress();
-if (history.length === 0) refillBag();
+// ---------- شروع اولیه ----------
+updateStats();
+if (history.length === 0) initExamBag();
 </script>
 </body>
 </html>
