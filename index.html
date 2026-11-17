@@ -48,8 +48,8 @@
     border-radius: 16px; margin-bottom: 20px; border: 1px dashed #475569;
   }
   .question-label { font-size: 12px; color: #94a3b8; margin-bottom: 10px; }
-  .question-text { font-size: 28px; font-weight: bold; color: #60a5fa; min-height: 50px; }
-  .question-text.fa { color: #f472b6; direction: rtl; font-size: 24px; }
+  .question-text { font-size: 22px; font-weight: bold; color: #60a5fa; min-height: 60px; line-height: 1.6; }
+  .question-text.fa { color: #f472b6; direction: rtl; }
 
   .mic-status {
     font-size: 48px; margin: 10px 0; height: 60px;
@@ -89,7 +89,6 @@
   .progress { height: 6px; background: #0f172a; border-radius: 3px; overflow: hidden; margin: 10px 0; }
   .progress > div { height: 100%; background: linear-gradient(90deg, #fbbf24, #f472b6); width: 0%; transition: .3s; }
 
-  /* استایل صفحه نتیجه */
   .result-screen { display: none; text-align: center; padding: 20px 0; }
   .result-screen h2 { color: #fbbf24; font-size: 24px; }
   .result-score { font-size: 48px; font-weight: bold; color: #4ade80; margin: 20px 0; }
@@ -99,20 +98,18 @@
 </head>
 <body>
 
-<!-- صفحه خوش‌آمد و درخواست مجوز -->
 <div id="splash">
   <div class="big-icon">📝</div>
   <h2>آزمون پایان ترم زبان هفتم</h2>
-  <p>کل کتاب (Lesson 1 تا 8) — بدون تکرار، کاملاً تصادفی</p>
-
-  <button onclick="requestPermissionsAndStart()">✅ شروع آزمون پایان ترم</button>
+  <p>کل کتاب (دانش‌آموز + کار) — لغت، گرامر، مکالمه</p>
+  <button onclick="requestPermissionsAndStart()">✅ شروع آزمون</button>
   <p class="hint" style="color:#94a3b8; margin-top: 16px;">
     پس از زدن دکمه، به میکروفن اجازه (Allow) بدهید.
   </p>
 </div>
 
 <header>
-  <h1>📝 آزمون پایان ترم زبان هفتم</h1>
+  <h1>📝 آزمون پایان ترم هفتم</h1>
   <p>هیچ سوالی تکرار نمی‌شود!</p>
 </header>
 
@@ -145,7 +142,6 @@
     </div>
   </div>
 
-  <!-- صفحه نتیجه -->
   <div id="resultContainer" class="card result-screen">
     <h2>🏆 نتیجه نهایی آزمون</h2>
     <div class="result-score" id="finalScore">20</div>
@@ -160,118 +156,262 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ---------- داده‌های کامل کتاب هفتم (Lesson 1 تا 8) ----------
-const WORDS = [
-  // Lesson 1
-  {en:"Hello", fa:"سلام"}, {en:"Hi", fa:"سلام (غیررسمی)"}, {en:"Good morning", fa:"صبح بخیر"},
-  {en:"Good afternoon", fa:"عصر بخیر"}, {en:"Good evening", fa:"شب بخیر"},
-  {en:"Goodbye", fa:"خداحافظ"}, {en:"How are you?", fa:"حالت چطور است؟"},
-  {en:"I am fine, thank you", fa:"من خوبم، ممنون"}, {en:"What is your name?", fa:"اسم تو چیست؟"},
-  {en:"My name is Ali", fa:"اسم من علی است"}, {en:"Nice to meet you", fa:"از آشنایی با شما خوشحالم"},
-  {en:"This is", fa:"این ... است"}, {en:"Yes", fa:"بله"}, {en:"No", fa:"نه"},
-  // Lesson 2
-  {en:"book", fa:"کتاب"}, {en:"notebook", fa:"دفتر"}, {en:"pen", fa:"خودکار"},
-  {en:"pencil", fa:"مداد"}, {en:"bag", fa:"کیف"}, {en:"ruler", fa:"خط‌کش"},
-  {en:"eraser", fa:"پاک‌کن"}, {en:"dictionary", fa:"فرهنگ لغت"}, {en:"What is this?", fa:"این چیست؟"},
-  {en:"This is a book", fa:"این یک کتاب است"}, {en:"What is that?", fa:"آن چیست؟"},
-  {en:"Is this a pen?", fa:"آیا این یک خودکار است؟"}, {en:"Yes, it is", fa:"بله، هست"},
-  {en:"No, it is not", fa:"نه، نیست"}, {en:"Look at the board", fa:"به تخته نگاه کن"},
-  {en:"Open your book", fa:"کتابت را باز کن"}, {en:"Close your book", fa:"کتابت را ببند"},
-  {en:"Listen", fa:"گوش کن"}, {en:"Repeat", fa:"تکرار کن"},
-  // Lesson 3
-  {en:"red", fa:"قرمز"}, {en:"blue", fa:"آبی"}, {en:"green", fa:"سبز"},
-  {en:"yellow", fa:"زرد"}, {en:"black", fa:"سیاه"}, {en:"white", fa:"سفید"},
-  {en:"orange", fa:"نارنجی"}, {en:"brown", fa:"قهوه‌ای"}, {en:"What color is this?", fa:"این چه رنگی است؟"},
-  {en:"It is red", fa:"آن قرمز است"}, {en:"My favorite color is blue", fa:"رنگ مورد علاقه من آبی است"},
-  {en:"What is your favorite color?", fa:"رنگ مورد علاقه تو چیست؟"}, {en:"shirt", fa:"پیراهن"},
-  {en:"pants", fa:"شلوار"}, {en:"shoes", fa:"کفش"}, {en:"socks", fa:"جوراب"},
-  {en:"hat", fa:"کلاه"}, {en:"coat", fa:"پالتو"},
-  // Lesson 4
-  {en:"father", fa:"پدر"}, {en:"mother", fa:"مادر"}, {en:"brother", fa:"برادر"},
-  {en:"sister", fa:"خواهر"}, {en:"grandfather", fa:"پدربزرگ"}, {en:"grandmother", fa:"مادربزرگ"},
-  {en:"uncle", fa:"عمو / دایی"}, {en:"aunt", fa:"عمه / خاله"}, {en:"family", fa:"خانواده"},
-  {en:"Who is he?", fa:"او (مرد) کیست؟"}, {en:"Who is she?", fa:"او (زن) کیست؟"},
-  {en:"He is my brother", fa:"او برادر من است"}, {en:"She is my sister", fa:"او خواهر من است"},
-  {en:"This is my family", fa:"این خانواده من است"}, {en:"How old are you?", fa:"چند سالت است؟"},
-  {en:"I am twelve years old", fa:"من دوازده سال دارم"}, {en:"How old is he?", fa:"او چند سال دارد؟"},
-  {en:"doctor", fa:"دکتر"}, {en:"teacher", fa:"معلم"}, {en:"student", fa:"دانش‌آموز"},
-  {en:"engineer", fa:"مهندس"}, {en:"nurse", fa:"پرستار"}, {en:"driver", fa:"راننده"},
-  // Lesson 5
-  {en:"apple", fa:"سیب"}, {en:"banana", fa:"موز"}, {en:"orange", fa:"پرتقال"},
-  {en:"bread", fa:"نان"}, {en:"milk", fa:"شیر"}, {en:"water", fa:"آب"},
-  {en:"egg", fa:"تخم مرغ"}, {en:"rice", fa:"برنج"}, {en:"chicken", fa:"مرغ"},
-  {en:"fish", fa:"ماهی"}, {en:"What do you want?", fa:"چه می‌خواهی؟"},
-  {en:"I want an apple", fa:"من یک سیب می‌خواهم"}, {en:"What does he want?", fa:"او چه می‌خواهد؟"},
-  {en:"Do you like apples?", fa:"آیا سیب دوست داری؟"}, {en:"Yes, I do", fa:"بله، دوست دارم"},
-  {en:"No, I do not", fa:"نه، دوست ندارم"}, {en:"I am hungry", fa:"من گرسنه هستم"},
-  {en:"I am thirsty", fa:"من تشنه هستم"}, {en:"Delicious", fa:"خوشمزه"}, {en:"food", fa:"غذا"},
-  // Lesson 6
-  {en:"school", fa:"مدرسه"}, {en:"classroom", fa:"کلاس درس"}, {en:"library", fa:"کتابخانه"},
-  {en:"door", fa:"در"}, {en:"window", fa:"پنجره"}, {en:"blackboard", fa:"تخته سیاه"},
-  {en:"desk", fa:"میز تحریر"}, {en:"chair", fa:"صندلی"}, {en:"Where is the book?", fa:"کتاب کجاست؟"},
-  {en:"It is on the desk", fa:"آن روی میز است"}, {en:"It is in the bag", fa:"آن داخل کیف است"},
-  {en:"It is under the chair", fa:"آن زیر صندلی است"}, {en:"on", fa:"روی"}, {en:"in", fa:"در / داخل"},
-  {en:"under", fa:"زیر"}, {en:"next to", fa:"کنار"}, {en:"behind", fa:"پشت"},
-  {en:"in front of", fa:"جلوی"}, {en:"between", fa:"بین"}, {en:"playground", fa:"حیاط مدرسه"},
-  {en:"office", fa:"دفتر"},
-  // Lesson 7
-  {en:"run", fa:"دویدن"}, {en:"walk", fa:"راه رفتن"}, {en:"jump", fa:"پریدن"},
-  {en:"swim", fa:"شنا کردن"}, {en:"ride a bike", fa:"دوچرخه سواری کردن"},
-  {en:"play football", fa:"فوتبال بازی کردن"}, {en:"watch TV", fa:"تلویزیون تماشا کردن"},
-  {en:"read a book", fa:"کتاب خواندن"}, {en:"write", fa:"نوشتن"}, {en:"sleep", fa:"خوابیدن"},
-  {en:"What are you doing?", fa:"داری چه کار می‌کنی؟"}, {en:"I am reading a book", fa:"دارم کتاب می‌خوانم"},
-  {en:"He is playing football", fa:"او دارد فوتبال بازی می‌کند"}, {en:"They are swimming", fa:"آنها دارند شنا می‌کنند"},
-  {en:"Can you swim?", fa:"آیا می‌توانی شنا کنی؟"}, {en:"Yes, I can", fa:"بله، می‌توانم"},
-  {en:"No, I cannot", fa:"نه، نمی‌توانم"}, {en:"Can he ride a bike?", fa:"آیا او می‌تواند دوچرخه سواری کند؟"},
-  {en:"sport", fa:"ورزش"}, {en:"game", fa:"بازی"},
-  // Lesson 8
-  {en:"Spring", fa:"بهار"}, {en:"Summer", fa:"تابستان"}, {en:"Fall", fa:"پاییز"},
-  {en:"Winter", fa:"زمستان"}, {en:"season", fa:"فصل"}, {en:"weather", fa:"هوا"},
-  {en:"sunny", fa:"آفتابی"}, {en:"rainy", fa:"بارانی"}, {en:"cloudy", fa:"ابری"},
-  {en:"snowy", fa:"برفی"}, {en:"windy", fa:"بادی"}, {en:"hot", fa:"گرم"},
-  {en:"cold", fa:"سرد"}, {en:"warm", fa:"ملایم"}, {en:"cool", fa:"خنک"},
-  {en:"What is the weather like?", fa:"هوا چطور است؟"}, {en:"It is sunny", fa:"هوا آفتابی است"},
-  {en:"It is raining", fa:"باران می‌بارد"}, {en:"It is snowing", fa:"برف می‌بارد"},
-  {en:"What season do you like?", fa:"چه فصلی را دوست داری؟"}, {en:"I like spring", fa:"من بهار را دوست دارم"},
-  {en:"Today", fa:"امروز"}, {en:"Tomorrow", fa:"فردا"}, {en:"Yesterday", fa:"دیروز"},
-  // جملات تکمیلی
-  {en:"Excuse me", fa:"ببخشید"}, {en:"I am sorry", fa:"متاسفم"}, {en:"Thank you very much", fa:"خیلی ممنون"},
-  {en:"You are welcome", fa:"خواهش می‌کنم"}, {en:"Please", fa:"لطفا"}, {en:"See you later", fa:"بعدا می‌بینمت"},
-  {en:"See you tomorrow", fa:"فردا می‌بینمت"}, {en:"How do you spell it?", fa:"چطور آن را هجی می‌کنی؟"},
-  {en:"What does this mean?", fa:"این چه معنایی دارد؟"}, {en:"I do not know", fa:"نمی‌دانم"},
-  {en:"I know", fa:"می‌دانم"}, {en:"Can you help me?", fa:"می‌توانی به من کمک کنی؟"},
-  {en:"Of course", fa:"البته"}, {en:"Let us go", fa:"بیا برویم"}, {en:"Come here", fa:"بیا اینجا"},
-  {en:"Go there", fa:"برو آنجا"}, {en:"Stand up", fa:"بایست"}, {en:"Sit down", fa:"بنشین"},
-  {en:"Open the door", fa:"در را باز کن"}, {en:"Close the window", fa:"پنجره را ببند"},
-  {en:"Listen to me", fa:"به من گوش کن"}, {en:"Look at the picture", fa:"به تصویر نگاه کن"},
-  {en:"Write your name", fa:"اسمت را بنویس"}, {en:"Read the text", fa:"متن را بخوان"},
-  {en:"number", fa:"عدد / شماره"}, {en:"one", fa:"یک"}, {en:"two", fa:"دو"},
-  {en:"three", fa:"سه"}, {en:"four", fa:"چهار"}, {en:"five", fa:"پنج"},
-  {en:"six", fa:"شش"}, {en:"seven", fa:"هفت"}, {en:"eight", fa:"هشت"},
-  {en:"nine", fa:"نه"}, {en:"ten", fa:"ده"},
-  {en:"Monday", fa:"دوشنبه"}, {en:"Tuesday", fa:"سه‌شنبه"}, {en:"Wednesday", fa:"چهارشنبه"},
-  {en:"Thursday", fa:"پنجشنبه"}, {en:"Friday", fa:"جمعه"}, {en:"Saturday", fa:"شنبه"}, {en:"Sunday", fa:"یکشنبه"}
+// ---------- دیتابیس جامع سوالات (کل کتاب هفتم) ----------
+const ALL_QUESTIONS = [
+  // ================= Lesson 1 =================
+  {en:"Hello", fa:"سلام", type:"vocab"},
+  {en:"Hi", fa:"سلام (غیررسمی)", type:"vocab"},
+  {en:"Good morning", fa:"صبح بخیر", type:"vocab"},
+  {en:"Good afternoon", fa:"عصر بخیر", type:"vocab"},
+  {en:"Good evening", fa:"شب بخیر", type:"vocab"},
+  {en:"Goodbye", fa:"خداحافظ", type:"vocab"},
+  {en:"How are you?", fa:"حالت چطور است؟", type:"conversation"},
+  {en:"I am fine, thank you", fa:"من خوبم، ممنون", type:"conversation"},
+  {en:"What is your name?", fa:"اسم تو چیست؟", type:"conversation"},
+  {en:"My name is Ali", fa:"اسم من علی است", type:"conversation"},
+  {en:"Nice to meet you", fa:"از آشنایی با شما خوشحالم", type:"conversation"},
+  {en:"A: How are you? B: I am ___", fa:"خوبم (fine)", type:"conversation"},
+  {en:"A: What is your name? B: My name ___ Ali.", fa:"است (is)", type:"conversation"},
+  {en:"A: Nice to meet you. B: Nice to meet you, ___", fa:"همچنین (too)", type:"conversation"},
+
+  // ================= Lesson 2 =================
+  {en:"book", fa:"کتاب", type:"vocab"},
+  {en:"notebook", fa:"دفتر", type:"vocab"},
+  {en:"pen", fa:"خودکار", type:"vocab"},
+  {en:"pencil", fa:"مداد", type:"vocab"},
+  {en:"bag", fa:"کیف", type:"vocab"},
+  {en:"ruler", fa:"خط‌کش", type:"vocab"},
+  {en:"eraser", fa:"پاک‌کن", type:"vocab"},
+  {en:"dictionary", fa:"فرهنگ لغت", type:"vocab"},
+  {en:"What is this?", fa:"این چیست؟", type:"conversation"},
+  {en:"This is a book", fa:"این یک کتاب است", type:"conversation"},
+  {en:"What is that?", fa:"آن چیست؟", type:"conversation"},
+  {en:"Is this a pen?", fa:"آیا این یک خودکار است؟", type:"conversation"},
+  {en:"Yes, it is", fa:"بله، هست", type:"conversation"},
+  {en:"No, it is not", fa:"نه، نیست", type:"conversation"},
+  {en:"A: What is this? B: This is a ___", fa:"کتاب (book)", type:"conversation"},
+  {en:"This is ___ apple. (a/an)", fa:"این یک سیب است. (an)", type:"grammar"},
+  {en:"I have ___ book. (a/an)", fa:"من یک کتاب دارم. (a)", type:"grammar"},
+
+  // ================= Lesson 3 =================
+  {en:"red", fa:"قرمز", type:"vocab"},
+  {en:"blue", fa:"آبی", type:"vocab"},
+  {en:"green", fa:"سبز", type:"vocab"},
+  {en:"yellow", fa:"زرد", type:"vocab"},
+  {en:"black", fa:"سیاه", type:"vocab"},
+  {en:"white", fa:"سفید", type:"vocab"},
+  {en:"orange", fa:"نارنجی", type:"vocab"},
+  {en:"brown", fa:"قهوه‌ای", type:"vocab"},
+  {en:"What color is this?", fa:"این چه رنگی است؟", type:"conversation"},
+  {en:"It is red", fa:"آن قرمز است", type:"conversation"},
+  {en:"My favorite color is blue", fa:"رنگ مورد علاقه من آبی است", type:"conversation"},
+  {en:"What is your favorite color?", fa:"رنگ مورد علاقه تو چیست؟", type:"conversation"},
+  {en:"shirt", fa:"پیراهن", type:"vocab"},
+  {en:"pants", fa:"شلوار", type:"vocab"},
+  {en:"shoes", fa:"کفش", type:"vocab"},
+  {en:"socks", fa:"جوراب", type:"vocab"},
+  {en:"hat", fa:"کلاه", type:"vocab"},
+  {en:"coat", fa:"پالتو", type:"vocab"},
+  {en:"A: What color is it? B: It is ___", fa:"قرمز (red)", type:"conversation"},
+
+  // ================= Lesson 4 =================
+  {en:"father", fa:"پدر", type:"vocab"},
+  {en:"mother", fa:"مادر", type:"vocab"},
+  {en:"brother", fa:"برادر", type:"vocab"},
+  {en:"sister", fa:"خواهر", type:"vocab"},
+  {en:"grandfather", fa:"پدربزرگ", type:"vocab"},
+  {en:"grandmother", fa:"مادربزرگ", type:"vocab"},
+  {en:"uncle", fa:"عمو / دایی", type:"vocab"},
+  {en:"aunt", fa:"عمه / خاله", type:"vocab"},
+  {en:"family", fa:"خانواده", type:"vocab"},
+  {en:"Who is he?", fa:"او (مرد) کیست؟", type:"conversation"},
+  {en:"Who is she?", fa:"او (زن) کیست؟", type:"conversation"},
+  {en:"He is my brother", fa:"او برادر من است", type:"conversation"},
+  {en:"She is my sister", fa:"او خواهر من است", type:"conversation"},
+  {en:"This is my family", fa:"این خانواده من است", type:"conversation"},
+  {en:"How old are you?", fa:"چند سالت است؟", type:"conversation"},
+  {en:"I am twelve years old", fa:"من دوازده سال دارم", type:"conversation"},
+  {en:"How old is he?", fa:"او چند سال دارد؟", type:"conversation"},
+  {en:"doctor", fa:"دکتر", type:"vocab"},
+  {en:"teacher", fa:"معلم", type:"vocab"},
+  {en:"student", fa:"دانش‌آموز", type:"vocab"},
+  {en:"engineer", fa:"مهندس", type:"vocab"},
+  {en:"nurse", fa:"پرستار", type:"vocab"},
+  {en:"driver", fa:"راننده", type:"vocab"},
+  {en:"A: Who is she? B: She is my ___", fa:"خواهر (sister)", type:"conversation"},
+  {en:"A: How old are you? B: I am twelve ___ old.", fa:"سال (years)", type:"conversation"},
+  {en:"___ is your name? (What/Who)", fa:"اسم تو چیست؟ (What)", type:"grammar"},
+  {en:"___ is he? He is my brother. (What/Who)", fa:"او کیست؟ او برادر من است. (Who)", type:"grammar"},
+
+  // ================= Lesson 5 =================
+  {en:"apple", fa:"سیب", type:"vocab"},
+  {en:"banana", fa:"موز", type:"vocab"},
+  {en:"orange", fa:"پرتقال", type:"vocab"},
+  {en:"bread", fa:"نان", type:"vocab"},
+  {en:"milk", fa:"شیر", type:"vocab"},
+  {en:"water", fa:"آب", type:"vocab"},
+  {en:"egg", fa:"تخم مرغ", type:"vocab"},
+  {en:"rice", fa:"برنج", type:"vocab"},
+  {en:"chicken", fa:"مرغ", type:"vocab"},
+  {en:"fish", fa:"ماهی", type:"vocab"},
+  {en:"What do you want?", fa:"چه می‌خواهی؟", type:"conversation"},
+  {en:"I want an apple", fa:"من یک سیب می‌خواهم", type:"conversation"},
+  {en:"What does he want?", fa:"او چه می‌خواهد؟", type:"conversation"},
+  {en:"Do you like apples?", fa:"آیا سیب دوست داری؟", type:"conversation"},
+  {en:"Yes, I do", fa:"بله، دوست دارم", type:"conversation"},
+  {en:"No, I do not", fa:"نه، دوست ندارم", type:"conversation"},
+  {en:"I am hungry", fa:"من گرسنه هستم", type:"conversation"},
+  {en:"I am thirsty", fa:"من تشنه هستم", type:"conversation"},
+  {en:"Delicious", fa:"خوشمزه", type:"vocab"},
+  {en:"food", fa:"غذا", type:"vocab"},
+  {en:"A: What do you want? B: I want an ___", fa:"سیب (apple)", type:"conversation"},
+  {en:"I ___ like apples. (do/does/don't)", fa:"من سیب دوست ندارم. (don't)", type:"grammar"},
+  {en:"___ you like football? (Do/Does)", fa:"آیا فوتبال دوست داری؟ (Do)", type:"grammar"},
+
+  // ================= Lesson 6 =================
+  {en:"school", fa:"مدرسه", type:"vocab"},
+  {en:"classroom", fa:"کلاس درس", type:"vocab"},
+  {en:"library", fa:"کتابخانه", type:"vocab"},
+  {en:"door", fa:"در", type:"vocab"},
+  {en:"window", fa:"پنجره", type:"vocab"},
+  {en:"blackboard", fa:"تخته سیاه", type:"vocab"},
+  {en:"desk", fa:"میز تحریر", type:"vocab"},
+  {en:"chair", fa:"صندلی", type:"vocab"},
+  {en:"Where is the book?", fa:"کتاب کجاست؟", type:"conversation"},
+  {en:"It is on the desk", fa:"آن روی میز است", type:"conversation"},
+  {en:"It is in the bag", fa:"آن داخل کیف است", type:"conversation"},
+  {en:"It is under the chair", fa:"آن زیر صندلی است", type:"conversation"},
+  {en:"on", fa:"روی", type:"vocab"},
+  {en:"in", fa:"در / داخل", type:"vocab"},
+  {en:"under", fa:"زیر", type:"vocab"},
+  {en:"next to", fa:"کنار", type:"vocab"},
+  {en:"behind", fa:"پشت", type:"vocab"},
+  {en:"in front of", fa:"جلوی", type:"vocab"},
+  {en:"between", fa:"بین", type:"vocab"},
+  {en:"playground", fa:"حیاط مدرسه", type:"vocab"},
+  {en:"office", fa:"دفتر", type:"vocab"},
+  {en:"A: Where is the book? B: It is ___ the desk.", fa:"روی (on)", type:"conversation"},
+  {en:"The book is ___ the desk. (on/in)", fa:"کتاب روی میز است. (on)", type:"grammar"},
+  {en:"The pen is ___ the bag. (on/in)", fa:"خودکار داخل کیف است. (in)", type:"grammar"},
+
+  // ================= Lesson 7 =================
+  {en:"run", fa:"دویدن", type:"vocab"},
+  {en:"walk", fa:"راه رفتن", type:"vocab"},
+  {en:"jump", fa:"پریدن", type:"vocab"},
+  {en:"swim", fa:"شنا کردن", type:"vocab"},
+  {en:"ride a bike", fa:"دوچرخه سواری کردن", type:"vocab"},
+  {en:"play football", fa:"فوتبال بازی کردن", type:"vocab"},
+  {en:"watch TV", fa:"تلویزیون تماشا کردن", type:"vocab"},
+  {en:"read a book", fa:"کتاب خواندن", type:"vocab"},
+  {en:"write", fa:"نوشتن", type:"vocab"},
+  {en:"sleep", fa:"خوابیدن", type:"vocab"},
+  {en:"What are you doing?", fa:"داری چه کار می‌کنی؟", type:"conversation"},
+  {en:"I am reading a book", fa:"دارم کتاب می‌خوانم", type:"conversation"},
+  {en:"He is playing football", fa:"او دارد فوتبال بازی می‌کند", type:"conversation"},
+  {en:"They are swimming", fa:"آنها دارند شنا می‌کنند", type:"conversation"},
+  {en:"Can you swim?", fa:"آیا می‌توانی شنا کنی؟", type:"conversation"},
+  {en:"Yes, I can", fa:"بله، می‌توانم", type:"conversation"},
+  {en:"No, I cannot", fa:"نه، نمی‌توانم", type:"conversation"},
+  {en:"Can he ride a bike?", fa:"آیا او می‌تواند دوچرخه سواری کند؟", type:"conversation"},
+  {en:"sport", fa:"ورزش", type:"vocab"},
+  {en:"game", fa:"بازی", type:"vocab"},
+  {en:"A: What are you doing? B: I am ___ a book.", fa:"خواندن (reading)", type:"conversation"},
+  {en:"He ___ playing football. (is/are)", fa:"او دارد فوتبال بازی می‌کند. (is)", type:"grammar"},
+  {en:"They ___ swimming. (is/are)", fa:"آنها دارند شنا می‌کنند. (are)", type:"grammar"},
+  {en:"___ you swim? Yes, I can. (Can/Do)", fa:"آیا می‌توانی شنا کنی؟ (Can)", type:"grammar"},
+  {en:"She can ___ a bike. (ride/rides)", fa:"او می‌تواند دوچرخه سواری کند. (ride)", type:"grammar"},
+  {en:"I am ___ a book. (read/reading)", fa:"من دارم کتاب می‌خوانم. (reading)", type:"grammar"},
+
+  // ================= Lesson 8 =================
+  {en:"Spring", fa:"بهار", type:"vocab"},
+  {en:"Summer", fa:"تابستان", type:"vocab"},
+  {en:"Fall", fa:"پاییز", type:"vocab"},
+  {en:"Winter", fa:"زمستان", type:"vocab"},
+  {en:"season", fa:"فصل", type:"vocab"},
+  {en:"weather", fa:"هوا", type:"vocab"},
+  {en:"sunny", fa:"آفتابی", type:"vocab"},
+  {en:"rainy", fa:"بارانی", type:"vocab"},
+  {en:"cloudy", fa:"ابری", type:"vocab"},
+  {en:"snowy", fa:"برفی", type:"vocab"},
+  {en:"windy", fa:"بادی", type:"vocab"},
+  {en:"hot", fa:"گرم", type:"vocab"},
+  {en:"cold", fa:"سرد", type:"vocab"},
+  {en:"warm", fa:"ملایم", type:"vocab"},
+  {en:"cool", fa:"خنک", type:"vocab"},
+  {en:"What is the weather like?", fa:"هوا چطور است؟", type:"conversation"},
+  {en:"It is sunny", fa:"هوا آفتابی است", type:"conversation"},
+  {en:"It is raining", fa:"باران می‌بارد", type:"conversation"},
+  {en:"It is snowing", fa:"برف می‌بارد", type:"conversation"},
+  {en:"What season do you like?", fa:"چه فصلی را دوست داری؟", type:"conversation"},
+  {en:"I like spring", fa:"من بهار را دوست دارم", type:"conversation"},
+  {en:"A: What is the weather like? B: It is ___", fa:"آفتابی (sunny)", type:"conversation"},
+  {en:"What ___ the weather like? (is/are)", fa:"هوا چطور است؟ (is)", type:"grammar"},
+  {en:"It is ___ today. (sun/sunny)", fa:"امروز آفتابی است. (sunny)", type:"grammar"},
+  {en:"I ___ a student. (am/is/are)", fa:"من یک دانش‌آموز هستم. (am)", type:"grammar"},
+  {en:"She ___ my sister. (am/is/are)", fa:"او خواهر من است. (is)", type:"grammar"},
+  {en:"They ___ in the classroom. (am/is/are)", fa:"آنها در کلاس هستند. (are)", type:"grammar"},
+  {en:"___ old are you? (How/What)", fa:"چند سالت است؟ (How)", type:"grammar"},
+
+  // ================= جملات کاربردی کتاب کار =================
+  {en:"Excuse me", fa:"ببخشید", type:"vocab"},
+  {en:"I am sorry", fa:"متاسفم", type:"vocab"},
+  {en:"Thank you very much", fa:"خیلی ممنون", type:"conversation"},
+  {en:"You are welcome", fa:"خواهش می‌کنم", type:"conversation"},
+  {en:"Please", fa:"لطفا", type:"vocab"},
+  {en:"See you later", fa:"بعدا می‌بینمت", type:"conversation"},
+  {en:"See you tomorrow", fa:"فردا می‌بینمت", type:"conversation"},
+  {en:"How do you spell it?", fa:"چطور آن را هجی می‌کنی؟", type:"conversation"},
+  {en:"What does this mean?", fa:"این چه معنایی دارد؟", type:"conversation"},
+  {en:"I do not know", fa:"نمی‌دانم", type:"conversation"},
+  {en:"I know", fa:"می‌دانم", type:"conversation"},
+  {en:"Can you help me?", fa:"می‌توانی به من کمک کنی؟", type:"conversation"},
+  {en:"Of course", fa:"البته", type:"conversation"},
+  {en:"Let us go", fa:"بیا برویم", type:"conversation"},
+  {en:"Come here", fa:"بیا اینجا", type:"conversation"},
+  {en:"Go there", fa:"برو آنجا", type:"conversation"},
+  {en:"Stand up", fa:"بایست", type:"conversation"},
+  {en:"Sit down", fa:"بنشین", type:"conversation"},
+  {en:"Open the door", fa:"در را باز کن", type:"conversation"},
+  {en:"Close the window", fa:"پنجره را ببند", type:"conversation"},
+  {en:"Listen to me", fa:"به من گوش کن", type:"conversation"},
+  {en:"Look at the picture", fa:"به تصویر نگاه کن", type:"conversation"},
+  {en:"Write your name", fa:"اسمت را بنویس", type:"conversation"},
+  {en:"Read the text", fa:"متن را بخوان", type:"conversation"},
+  {en:"Monday", fa:"دوشنبه", type:"vocab"},
+  {en:"Tuesday", fa:"سه‌شنبه", type:"vocab"},
+  {en:"Wednesday", fa:"چهارشنبه", type:"vocab"},
+  {en:"Thursday", fa:"پنجشنبه", type:"vocab"},
+  {en:"Friday", fa:"جمعه", type:"vocab"},
+  {en:"Saturday", fa:"شنبه", type:"vocab"},
+  {en:"Sunday", fa:"یکشنبه", type:"vocab"},
+  {en:"one", fa:"یک", type:"vocab"},
+  {en:"two", fa:"دو", type:"vocab"},
+  {en:"three", fa:"سه", type:"vocab"},
+  {en:"four", fa:"چهار", type:"vocab"},
+  {en:"five", fa:"پنج", type:"vocab"},
+  {en:"six", fa:"شش", type:"vocab"},
+  {en:"seven", fa:"هفت", type:"vocab"},
+  {en:"eight", fa:"هشت", type:"vocab"},
+  {en:"nine", fa:"نه", type:"vocab"},
+  {en:"ten", fa:"ده", type:"vocab"}
 ];
 
 // ---------- الگوریتم عدم تکرار کامل ----------
 let bag = [];
-let history = JSON.parse(localStorage.getItem('exam_history') || '[]');
+let history = JSON.parse(localStorage.getItem('exam_history_v3') || '[]');
 let stats = { correct: 0, wrong: 0, score: 0 };
 let examActive = false;
 
 function initExamBag() {
-  // کلماتی که هنوز پرسیده نشده‌اند
-  let remaining = WORDS.filter(w => !history.includes(w.en));
+  let remaining = ALL_QUESTIONS.filter(q => !history.includes(q.en));
   
-  // اگر همه سوالات پرسیده شدند، تاریخچه پاک می‌شود تا ترم جدید شروع شود
   if (remaining.length === 0) {
     history = [];
-    localStorage.setItem('exam_history', JSON.stringify(history));
-    remaining = [...WORDS];
+    localStorage.setItem('exam_history_v3', JSON.stringify(history));
+    remaining = [...ALL_QUESTIONS];
     toast('همه سوالات پرسیده شدند. ترم جدید آغاز شد!');
   }
   
-  // شافل کردن (به هم ریختن کامل ترتیب)
   bag = shuffle([...remaining]);
 }
 
@@ -285,7 +425,7 @@ function shuffle(a) {
 
 // ---------- وضعیت ----------
 let current = null;
-let mode = 'en'; // نوع سوال: en (انگلیسی به فارسی) یا fa (فارسی به انگلیسی)
+let mode = 'en'; 
 let answered = false;
 let isSpeaking = false;
 let isListening = false;
@@ -384,28 +524,25 @@ function toggleAuto() {
   }
 }
 
-// ---------- سوال بعدی (کاملاً تصادفی و یکتا) ----------
+// ---------- سوال بعدی ----------
 function nextQuestion(speak) {
   if (!examActive || !autoMode) return;
   answered = false;
   
-  // اگر کیسه خالی شد، یعنی یک دور کامل تمام شده
   if (bag.length === 0) {
     initExamBag();
-    if (bag.length === 0) { finishExam(); return; } // در صورت خالی بودن کامل
+    if (bag.length === 0) { finishExam(); return; }
   }
   
-  // برداشتن یک کلمه از کیسه
   current = bag.pop();
   if (!current) return;
   
-  // ثبت در تاریخچه برای جلوگیری از تکرار در ترم‌های آینده
   if (!history.includes(current.en)) {
     history.push(current.en);
-    localStorage.setItem('exam_history', JSON.stringify(history));
+    localStorage.setItem('exam_history_v3', JSON.stringify(history));
   }
 
-  // تغییر تصادفی نوع سوال (انگلیسی به فارسی یا فارسی به انگلیسی)
+  // تصادفی کردن نوع سوال
   mode = Math.random() < 0.5 ? 'en' : 'fa';
   
   const qt = document.getElementById('questionText');
@@ -432,6 +569,7 @@ function speakQuestionThenListen() {
   isSpeaking = true;
   setMicIcon('🔊', 'speaking');
   setStatus('🎧 گوش کن...', '');
+  
   const text = (mode === 'en') ? current.en : current.fa;
   const lang = (mode === 'en') ? 'en-US' : 'fa-IR';
   
@@ -516,7 +654,7 @@ function speakFeedback(ok, onEnd) {
   speakText(text, 'en-US', onEnd);
 }
 
-// ---------- پایان آزمون و نمایش نتیجه ----------
+// ---------- پایان آزمون ----------
 function finishExam() {
   examActive = false;
   autoMode = false;
@@ -548,7 +686,7 @@ function updateStats() {
 }
 
 function updateProgress() {
-  const total = WORDS.length;
+  const total = ALL_QUESTIONS.length;
   const done = history.length;
   const pct = Math.min(100, Math.round((done / total) * 100));
   document.getElementById('progBar').style.width = pct + '%';
